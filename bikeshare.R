@@ -2,6 +2,7 @@
 
 # packages----
 library(jsonlite)
+library(dplyr)
 
 # Get data from APIs----
 # bike status has information about bike availability
