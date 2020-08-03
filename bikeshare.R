@@ -28,7 +28,7 @@ mybike <- bike%>% select("name", "lat", "lon", "num_bikes_available") %>% filter
 mybike <- subset(mybike, select = -c(lat,lon) ) # Drop the geocordinates
 colnames(mybike)[1] <- "Station"
 colnames(mybike)[2] <- "Available"
-print(available)
+print(mybike)
 
 # remove items no longer needed
 rm(bike, bikestation, bikestatus, n, s, e, w, station, status)
