@@ -1,0 +1,103 @@
+---
+title: "Toronto bike share"
+author: "Laurence Horton"
+date: "28/06/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Availability
+```{r packages, echo = FALSE, include = FALSE}
+library(jsonlite) # For APIs
+library(dplyr) # For data manipulation
+library(leaflet) # For mapping
+library(htmltools) # For popups on map
+```
+
+```{r get data from API, echo = FALSE, include = FALSE}
+# Bike status has information about bike availability and stations (locations, etc.)
+# Availability
+bikestatus <-
+  fromJSON("https://tor.publicbikesystem.net/ube/gbfs/v1/en/station_status")
+
+# Stations
+bikestation <-
+  fromJSON("https://tor.publicbikesystem.net/ube/gbfs/v1/en/station_information")
+
+# Convert to dataframes
+status <- as_tibble(bikestatus[["data"]][["stations"]])
+station <- as_tibble(bikestation[["data"]][["stations"]])
+```
+
+```{r merge, echo = FALSE, include = FALSE}
+bike <- as_tibble(merge(station, status, by = "station_id"))
+```
+
+```{r create geobox, echo = FALSE, include = FALSE}
+# Create geobox boundaries for stations close to me
+n <- (43.66731) # north
+s <- (43.66312) # south
+e <- (-79.3742) # east
+w <- (-79.3696) # west
+```
+
+
+```{r narrow search, echp = FALSE, include = FALSE}
+# Keep only name of station and number of bikes available
+mybike <-
+  bike %>%
+    rename(Station = name,
+           Lat = lat,
+           Lon = lon,
+         Available = num_bikes_available) %>%
+  select(Station, Lat, Lon, Available) %>%
+  filter(Lat < n &
+           Lat > s &
+           Lon > e &
+           Lon < w)
+mybike
+```
+
+```{r drop geocordinates and rename, echo = FALSE}
+availablebike <- mybike %>%
+  select(-c(Lat, Lon))
+availablebike
+```
+
+Map of bike availability
+```{r map results, echo = FALSE}
+leaflet(mybike) %>% addTiles() %>%
+  addMarkers(~Lon, ~Lat, popup = ~htmlEscape(Available))
+```
+
+# Citations
+## Data
+Toronto Parking Authority (2021) About Bike Share Toronto, 
+https://open.toronto.ca/dataset/bike-share-toronto/ published under Open Government Licence – Toronto https://open.toronto.ca/open-data-license/
+
+## Code
+Horton, L. (2021). Ontario COVID-19 Vaccinations. GitHub repository, https://github.com/laurencehorton/torontobikeshare
+published under Creative Commons Zero v1.0 Universal https://github.com/laurencehorton/torontobikeshare/blob/master/LICENSE
+
+## Packages
+Cheng, J., Karambelkar, B., Xie, Y. (2019). *leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library*. R package version 2.0.3. https://CRAN.R-project.org/package=leaflet
+
+Cheng, J., Sievert, C., Chang, W., Xie, Y., Allen, J. (2021). *htmltools: Tools for HTML*. R package version 0.5.1.1. https://CRAN.R-project.org/package=htmltools
+
+Ooms, J. (2014). *The jsonlite Package: A Practical and Consistent Mapping Between JSON Data and R Objects*. arXiv:1403.2805 [stat.CO] URL https://arxiv.org/abs/1403.2805.
+
+R Core Team (2018). *R: A language and environment for statistical computing. R Foundation for Statistical Computing*, Vienna, Austria. URL https://www.R-project.org/.
+
+Wickham, H., François, R., Henry, L., Müller K. (2021). *dplyr: A Grammar of Data Manipulation. R package version 1.0.6*. https://CRAN.R-project.org/package=dplyr
+
+```{r citations, echo = FALSE, include = FALSE}
+citation()
+citation("dplyr")
+citation("jsonlite")
+citation("leaflet")
+citation("htmltools")
+sessionInfo()
+```
