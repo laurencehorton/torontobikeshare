@@ -1,0 +1,9 @@
+---
+title: "My Toronto bike share"
+author: "Laurence Horton"
+date: "02/07/2021"
+output: html_document
+---
+
+```{r, child="bikeshare.Rmd"}
+```
