@@ -68,6 +68,11 @@ availablebike
 ```
 
 Map of bike availability
+```{r time and date, echo = FALSE}
+Sys.Date()
+Sys.time()
+```
+
 ```{r map results, echo = FALSE}
 leaflet(mybike) %>% addTiles() %>%
   addMarkers(~Lon, ~Lat, popup = ~htmlEscape(Available))
