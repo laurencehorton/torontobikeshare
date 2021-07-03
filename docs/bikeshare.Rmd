@@ -67,7 +67,7 @@ availablebike <- mybike %>%
 availablebike
 ```
 
-Map of bike availability
+Map of bike availability at:
 ```{r time and date, echo = FALSE}
 Sys.Date()
 Sys.time()
